@@ -1,0 +1,207 @@
+@author Kevin Ramos
+
+SQL STATEMENTS
+
+------to add states:---------------------------------------
+
+INSERT INTO stren.states 
+(
+SELECT 1, 'Rhode Island', ST_AsGeoJson(Shape), '44'
+FROM stren.ri_state
+);
+INSERT INTO stren.states 
+(
+SELECT 2, 'Maryland' , ST_AsGeoJson(Shape), '24'
+FROM stren.md_state
+);
+INSERT INTO stren.states 
+(
+SELECT OGR_FID + 2, name10 , ST_AsGeoJson(Shape), '37'
+FROM stren.nc_state
+);
+
+
+-----------------------to add districts:------------------------------
+
+INSERT INTO stren.districts
+(
+SELECT OGR_FID, id, ST_AsGeoJson(Shape), '44'
+FROM stren.ri_complete_congressional
+)
+;
+INSERT INTO stren.districts
+(
+SELECT OGR_FID+2, cong, ST_AsGeoJson(Shape), '37'
+FROM stren.nc_complete_congressional
+);
+INSERT INTO stren.districts
+(
+SELECT OGR_FID+15, congid, ST_AsGeoJson(Shape), '24'
+FROM stren.md_complete_congressional
+);
+
+-------------------------------to add precincts:-------------------------------
+
+INSERT INTO stren.precincts
+(
+SELECT OGR_FID, countyname, districtid, `name`, origname, ST_AsGeoJson(Shape), '44'
+FROM stren.complete_ri_precinct
+);
+INSERT INTO stren.precincts
+(
+SELECT OGR_FID + 425, countyname, districtid, `name`, origname, ST_AsGeoJson(Shape), '24'
+FROM stren.complete_md_precinct
+);
+INSERT INTO stren.precincts
+(
+SELECT OGR_FID+2274, countyname, districtid, `name`, origname, ST_AsGeoJson(Shape), '37'
+FROM stren.complete_nc_precinct
+);
+
+****Check NAMES 
+-----------------------------to add voting data:----------------------------------
+
+INSERT INTO stren.elections
+(
+SELECT NULL , demvot16, othvot16, repvot16, totvot16, 'CONG', '2016', OGR_FID
+FROM stren.complete_ri_precinct
+);
+INSERT INTO stren.elections
+(
+SELECT NULL , demvot18, othvot18, repvot18, totvot18, 'CONG', '2018', OGR_FID
+FROM stren.complete_ri_precinct
+);
+INSERT INTO stren.elections
+(
+SELECT NULL , demvotpres, othvotpres, repvotpres, totvotpres, 'PRES', '2016', OGR_FID
+FROM stren.complete_ri_precinct
+)
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+INSERT INTO stren.elections
+(
+SELECT NULL , demvot16, othvot16, repvot16, totvot16, 'CONG', '2016', OGR_FID+425
+FROM stren.complete_md_precinct
+);
+INSERT INTO stren.elections
+(
+SELECT NULL , demvot18, othvot18, repvot18, totvot18, 'CONG', '2018', OGR_FID+425
+FROM stren.complete_md_precinct
+);
+INSERT INTO stren.elections
+(
+SELECT NULL , demvotpres, othvotpres, repvotpres, totvotpres, 'PRES', '2016', OGR_FID+425
+FROM stren.complete_md_precinct
+)
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+INSERT INTO stren.elections
+(
+SELECT NULL , demvot16, othvot16, repvot16, totvot16, 'CONG', '2016', OGR_FID+2274
+FROM stren.complete_nc_precinct
+);
+INSERT INTO stren.elections
+(
+SELECT NULL , demvot18, othvot18, repvot18, totvot18, 'CONG', '2018', OGR_FID+2274
+FROM stren.complete_nc_precinct
+);
+INSERT INTO stren.elections
+(
+SELECT NULL , demvotpres, othvotpres, repvotpres, totvotpres, 'PRES', '2016', OGR_FID+2274
+FROM stren.complete_nc_precinct
+)
+
+****Check for NULLS and -6 data
+--------------------------to add demographics------------------------------------------
+
+
+INSERT INTO stren.demographics
+(
+SELECT OGR_FID, aminov18, asianov18, blackov18, hawov18, hisov18, otherov18, pop100, whiteov18
+FROM stren.complete_ri_precinct
+);
+INSERT INTO stren.demographics
+(
+SELECT OGR_FID + 425, aminov18, asianov18, blackov18, hawov18, hisov18, otherov18, pop100, whiteov18
+FROM stren.complete_md_precinct
+);
+INSERT INTO stren.demographics
+(
+SELECT OGR_FID + 2274, aminov18, asianov18, blackov18, hawov18, hisov18, otherov18, pop100, whiteov18
+FROM stren.complete_nc_precinct
+);
+
+
+****Check for NULLS and -6 data
+--------------------------- to remove \' -------------------------------------------------------
+
+UPDATE stren.precincts SET name = REPLACE(name, '\'', '');
+UPDATE stren.precincts SET origname = REPLACE(origname, '\'', '');
+UPDATE stren.precincts SET countyname = REPLACE(countyname, '\'', '');
+
+
+
+----------------------------- to add gap precinct ------------------------------------------------
+
+INSERT INTO stren.precincts
+(
+SELECT OGR_FID, countyname, districtid, name, origname, ST_AsGeoJson(Shape), '24'
+FROM stren.gap_precinct
+);
+
+INSERT INTO stren.demographics
+(
+SELECT OGR_FID, 0, 0, 0, 0, 0, 0, 0, 0
+FROM stren.gap_precinct
+);
+
+INSERT INTO stren.elections
+(
+SELECT NULL , 0, 0, 0, 0, 'CONG', '2016', OGR_FID
+FROM stren.gap_precinct
+);
+INSERT INTO stren.elections
+(
+SELECT NULL , 0, 0, 0, 0, 'CONG', '2018', OGR_FID
+FROM stren.gap_precinct
+);
+INSERT INTO stren.elections
+(
+SELECT NULL , 0, 0, 0, 0, 'PRES', '2016', OGR_FID
+FROM stren.gap_precinct
+)
+
+-----------------------------------to add sourcees ----------------------------------------------------
+
+INSERT INTO stren.sources VALUES
+(
+NULL, '44', 'Rhode Island Geographic Information System (RIGIS)', 'Rhode Island Geographic Information System (RIGIS)', 'Rhode Island Geographic Information System (RIGIS)', 'Rhode Island Board of Elections', 'United States Census Bureau'
+);
+INSERT INTO stren.sources VALUES
+( 
+NULL, '24', 'United States Census Bureau', 'United States Census Bureau', 'Maryland Department of Planning', 'Maryland State Board of Elections','United States Census Bureau'
+);
+INSERT INTO stren.sources VALUES
+(
+NULL, '37', 'United States Census Bureau', 'North Carolina General Assembly', 'United States Census Bureau', 'North Carolina State Board of Elections', 'United States Census Bureau'
+);
+
+**********Check bc stabley a petunia*********************
+statefp, state, district, precinct, voting, demographic
+
+
+---------------------- TO ADD NEIGHBORS AND ERRORS--------------------------------------------
+**************MAKE SURE TO ADD IMPORTANT ERRORS FIRST
+neighbors - check
+enclosed precinct - check 
+voting anom / demographics anom/ghost precinct - check 
+multi - polygons - check 
+
+*************Add 'none' expression to fixed errors ********************
+UPDATE `stren`.`errors_unfixed` SET `error_type` = 'GAP' WHERE (`id` = '4981');
+UPDATE `stren`.`errors_unfixed` SET `error_type` = 'INTERSECT' WHERE (`id` = '2274');
+
+change (4981)gap and (2274)intersect
